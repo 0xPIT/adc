@@ -1,4 +1,4 @@
 adc
 ===
 
-Comprehensive AVR ADC Class
+Comprehensive AVR ADC implementaiton, supports calibraion and interpolation
