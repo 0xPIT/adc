@@ -28,16 +28,17 @@
 #define adcCorrection(ch)   (adcOffsetScaled - (adcCalibration[ch].lo * adcFactor(ch)))
 
 // ----------------------------------------------------------------------------- 
-// default values (Fluke 83 at Vcc = 5.000V)
+// default values (Data Precision 8200 +-10ppm at Vcc = 5.0V)
+// NB: these will vary per ATMega device
 //
 AdcCalibration_t eeAdcCalibration[adcChannels] EEMEM = {
   {
-    4870UL, // 3.000V calibration point
-     390UL  // 0.300V calibration point
+    4908UL, // 3.000V calibration point
+     459UL  // 0.300V calibration point
   },
   {
-    4871UL, // 3.000V calibration point
-     391UL  // 0.300V calibration point
+    4908UL, // 3.000V calibration point
+     459UL  // 0.300V calibration point
   }
 };
 
