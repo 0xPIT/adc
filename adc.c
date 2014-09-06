@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------- 
 // ADC Driver with oversampling, persisted calibration & linearization
 //
-// (c) 2012 karl@pitrich.com
+// (c) 2012, 2014 karl@pitrich.com
 // inspired by AVR120, AVR121
 // ----------------------------------------------------------------------------- 
 
@@ -13,8 +13,6 @@
 
 // ----------------------------------------------------------------------------- 
 
-#define adcChannels                 2    // read ADC0 and ADC1
-
 #define adcOversampleCount        128
 #define adcOversampleShift          4
 #define adcCalibrationMarkHi    30000UL  // 1/10mV, upper calibration point
@@ -24,25 +22,31 @@
 #define adcRoundingCorrection   32768UL  // add 0.5, which is: (2 ^ adcScale / 2)
 
 #define adcRangeScaled  ((adcCalibrationMarkHi - adcCalibrationMarkLo) << adcScale)
-#define adcFactor       (adcRangeScaled / (adcCalibration.hi - adcCalibration.lo))
-
 #define adcOffsetScaled (adcCalibrationMarkLo << adcScale)
-#define adcCorrection   (adcOffsetScaled - (adcCalibration.lo * adcFactor))
+
+#define adcFactor(ch)       (adcRangeScaled / (adcCalibration[ch].hi - adcCalibration[ch].lo))
+#define adcCorrection(ch)   (adcOffsetScaled - (adcCalibration[ch].lo * adcFactor(ch)))
 
 // ----------------------------------------------------------------------------- 
 // default values (Fluke 83 at Vcc = 5.000V)
 //
-AdcCalibration_t eeAdcCalibration EEMEM = {
-  4870UL, // 3.000V calibration point
-   396UL  // 0.300V calibration point
+AdcCalibration_t eeAdcCalibration[adcChannels] EEMEM = {
+  {
+    4870UL, // 3.000V calibration point
+     390UL  // 0.300V calibration point
+  },
+  {
+    4871UL, // 3.000V calibration point
+     391UL  // 0.300V calibration point
+  }
 };
 
-AdcCalibration_t adcCalibration;
-
-uint16_t adcAVcc;
+//AdcCalibration_t adcCalibration;
+AdcCalibration_t adcCalibration[adcChannels];
 
 // ----------------------------------------------------------------------------- 
 
+uint16_t adcAVcc;
 uint8_t adcChannel;
 volatile uint32_t adcOversampledValue[adcChannels];
 
@@ -61,12 +65,11 @@ ISR(ADC_vect)
     adcOversampleCounter[adcChannel] = 0;
   }
 
-  if (++adcChannel > (adcChannels - 1)) { // switch channel
-    adcChannel = 0;
-  }
-
+  // next channel
+  adcChannel = (adcChannel + 1) % adcChannels;
   adcSelectChannel(adcChannel); 
-  // no dummy read after switch results in necessary noise for oversampling
+
+  // no dummy read after switch results is the necessary noise for oversampling
 }
 
 // ----------------------------------------------------------------------------- 
@@ -134,7 +137,7 @@ uint32_t adcValue(uint8_t channel, AdcValueType_t valuetype)
   sei();
 
   if (valuetype == AdcReadLinearized) {
-    v = (v * adcFactor + adcCorrection + adcRoundingCorrection) >> adcScale;
+    v = (v * adcFactor(channel) + adcCorrection(channel) + adcRoundingCorrection) >> adcScale;
   }
 
   return v;

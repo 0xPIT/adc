@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------- 
 // ADC Driver with oversampling, persisted calibration & linearization
 //
-// (c) 2012 karl@pitrich.com
+// (c) 2012, 2014 karl@pitrich.com
 // inspired by AVR120, AVR121 and http://www.mikrocontroller.net/topic/170454 
 // ----------------------------------------------------------------------------- 
 
@@ -21,6 +21,10 @@ extern "C" {
 
 // ----------------------------------------------------------------------------- 
 
+#define adcChannels    2 // read ADC0 and ADC1
+
+// ----------------------------------------------------------------------------- 
+
 typedef enum AdcValueType_e {
   AdcReadLinearized = (1<<0),
   AdcReadRaw        = (1<<1)
@@ -34,7 +38,7 @@ typedef struct adcCalibration_s {
 // ----------------------------------------------------------------------------- 
 // calibration points at runtime
 
-extern AdcCalibration_t adcCalibration;
+extern AdcCalibration_t adcCalibration[adcChannels];
 
 // ----------------------------------------------------------------------------- 
 // measured AVCC at startup in mV
