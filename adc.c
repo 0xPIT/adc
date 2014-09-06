@@ -28,7 +28,7 @@
 #define adcCorrection(ch)   (adcOffsetScaled - (adcCalibration[ch].lo * adcFactor(ch)))
 
 // ----------------------------------------------------------------------------- 
-// default values (Data Precision 8200 +-10ppm at Vcc = 5.0V)
+// default values (Data Precision 8200 +-10ppm at ATMega Vcc = 5.0V)
 // NB: these will vary per ATMega device
 //
 AdcCalibration_t eeAdcCalibration[adcChannels] EEMEM = {
@@ -42,7 +42,6 @@ AdcCalibration_t eeAdcCalibration[adcChannels] EEMEM = {
   }
 };
 
-//AdcCalibration_t adcCalibration;
 AdcCalibration_t adcCalibration[adcChannels];
 
 // ----------------------------------------------------------------------------- 
